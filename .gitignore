@@ -1,0 +1,35 @@
+# Python
+venv/
+.venv/
+.run-venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+
+# Node
+node_modules/
+cdss/dist/
+cdss/.vite/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Logs
+*.log
+
+# RAG corpus (PDFs and generated artifacts — large / local only)
+cdss-backend/rag_corpus/pdfs/*.pdf
+cdss-backend/rag_corpus/chunks/
+cdss-backend/rag_corpus/embeddings/

@@ -1,0 +1,254 @@
+[
+  {
+    "run_id": "22d53771fc27",
+    "timestamp": "2026-04-20T07:17:12.896232+00:00",
+    "patient_id": null,
+    "overall_score": 92.2,
+    "grade": "A",
+    "scores": {
+      "diagnosis_confidence": 74.0,
+      "symptom_coverage": 100.0,
+      "medication_safety": 100.0,
+      "icd_validity": 100.0,
+      "allergy_safety": 100.0
+    },
+    "top_diagnosis": "Acute viral pharyngitis",
+    "llm_used": true,
+    "diagnosis_count": 5,
+    "safe_drugs": 3,
+    "warned_drugs": 0,
+    "blocked_drugs": 0,
+    "urgency": "routine"
+  },
+  {
+    "run_id": "4148d1497800",
+    "timestamp": "2026-04-25T06:30:29.875481+00:00",
+    "patient_id": 4,
+    "overall_score": 64.2,
+    "grade": "C",
+    "scores": {
+      "diagnosis_confidence": 64.0,
+      "symptom_coverage": 50.0,
+      "medication_safety": 83.3,
+      "icd_validity": 100.0,
+      "allergy_safety": 0.0
+    },
+    "top_diagnosis": "Chronic Fatigue Syndrome (Myalgic Encephalomyelitis)",
+    "llm_used": true,
+    "diagnosis_count": 5,
+    "safe_drugs": 5,
+    "warned_drugs": 0,
+    "blocked_drugs": 1,
+    "urgency": "routine"
+  },
+  {
+    "run_id": "4650191cca53",
+    "timestamp": "2026-04-25T08:06:52.156663+00:00",
+    "patient_id": 4,
+    "overall_score": 70.6,
+    "grade": "B",
+    "scores": {
+      "diagnosis_confidence": 62.0,
+      "symptom_coverage": 75.0,
+      "medication_safety": 90.0,
+      "icd_validity": 100.0,
+      "allergy_safety": 0.0
+    },
+    "top_diagnosis": "Type 2 Diabetes Mellitus",
+    "llm_used": true,
+    "diagnosis_count": 5,
+    "safe_drugs": 9,
+    "warned_drugs": 0,
+    "blocked_drugs": 1,
+    "urgency": "critical"
+  },
+  {
+    "run_id": "2470b75bbe6f",
+    "timestamp": "2026-04-25T08:12:43.482805+00:00",
+    "patient_id": 4,
+    "overall_score": 66.8,
+    "grade": "C",
+    "scores": {
+      "diagnosis_confidence": 52.0,
+      "symptom_coverage": 75.0,
+      "medication_safety": 87.5,
+      "icd_validity": 100.0,
+      "allergy_safety": 0.0
+    },
+    "top_diagnosis": "Type 2 Diabetes Mellitus",
+    "llm_used": true,
+    "diagnosis_count": 5,
+    "safe_drugs": 7,
+    "warned_drugs": 0,
+    "blocked_drugs": 1,
+    "urgency": "critical"
+  },
+  {
+    "run_id": "207c585c781a",
+    "timestamp": "2026-04-25T08:24:27.001006+00:00",
+    "patient_id": 4,
+    "overall_score": 65.3,
+    "grade": "C",
+    "scores": {
+      "diagnosis_confidence": 47.0,
+      "symptom_coverage": 75.0,
+      "medication_safety": 87.5,
+      "icd_validity": 100.0,
+      "allergy_safety": 0.0
+    },
+    "top_diagnosis": "Type 2 Diabetes Mellitus",
+    "llm_used": true,
+    "diagnosis_count": 4,
+    "safe_drugs": 7,
+    "warned_drugs": 0,
+    "blocked_drugs": 1,
+    "urgency": "critical"
+  },
+  {
+    "run_id": "8fc2c51de1bb",
+    "timestamp": "2026-04-25T08:33:51.105824+00:00",
+    "patient_id": 3,
+    "overall_score": 79.2,
+    "grade": "B",
+    "scores": {
+      "diagnosis_confidence": 64.0,
+      "symptom_coverage": 50.0,
+      "medication_safety": 100.0,
+      "icd_validity": 100.0,
+      "allergy_safety": 100.0
+    },
+    "top_diagnosis": "Myalgic Encephalomyelitis/Chronic Fatigue Syndrome",
+    "llm_used": true,
+    "diagnosis_count": 5,
+    "safe_drugs": 3,
+    "warned_drugs": 0,
+    "blocked_drugs": 0,
+    "urgency": "routine"
+  },
+  {
+    "run_id": "c6d25372a1f8",
+    "timestamp": "2026-04-25T08:54:47.464844+00:00",
+    "patient_id": 3,
+    "overall_score": 92.3,
+    "grade": "A",
+    "scores": {
+      "diagnosis_confidence": 74.3,
+      "symptom_coverage": 100.0,
+      "medication_safety": 100.0,
+      "icd_validity": 100.0,
+      "allergy_safety": 100.0
+    },
+    "top_diagnosis": "Acute Coronary Syndrome (Unstable Angina/Non-ST Elevation Myocardial Infarction)",
+    "llm_used": true,
+    "diagnosis_count": 5,
+    "safe_drugs": 7,
+    "warned_drugs": 0,
+    "blocked_drugs": 0,
+    "urgency": "critical"
+  },
+  {
+    "run_id": "18f757b294ef",
+    "timestamp": "2026-04-25T10:30:16.906116+00:00",
+    "patient_id": 1,
+    "overall_score": 79.2,
+    "grade": "B",
+    "scores": {
+      "diagnosis_confidence": 64.0,
+      "symptom_coverage": 50.0,
+      "medication_safety": 100.0,
+      "icd_validity": 100.0,
+      "allergy_safety": 100.0
+    },
+    "top_diagnosis": "Chronic Fatigue Syndrome (Myalgic Encephalomyelitis)",
+    "llm_used": true,
+    "diagnosis_count": 5,
+    "safe_drugs": 10,
+    "warned_drugs": 0,
+    "blocked_drugs": 0,
+    "urgency": "routine"
+  },
+  {
+    "run_id": "fa35fba5d8ea",
+    "timestamp": "2026-04-25T13:06:47.077720+00:00",
+    "patient_id": 1,
+    "overall_score": 92.1,
+    "grade": "A",
+    "scores": {
+      "diagnosis_confidence": 73.7,
+      "symptom_coverage": 100.0,
+      "medication_safety": 100.0,
+      "icd_validity": 100.0,
+      "allergy_safety": 100.0
+    },
+    "top_diagnosis": "Acute Myocardial Infarction",
+    "llm_used": false,
+    "diagnosis_count": 5,
+    "safe_drugs": 10,
+    "warned_drugs": 0,
+    "blocked_drugs": 0,
+    "urgency": "critical"
+  },
+  {
+    "run_id": "2f3c39d73dac",
+    "timestamp": "2026-05-09T06:40:38.333618+00:00",
+    "patient_id": 10,
+    "overall_score": 72.0,
+    "grade": "B",
+    "scores": {
+      "diagnosis_confidence": 56.7,
+      "symptom_coverage": 25.0,
+      "medication_safety": 100.0,
+      "icd_validity": 100.0,
+      "allergy_safety": 100.0
+    },
+    "top_diagnosis": "Community-Acquired Pneumonia",
+    "llm_used": false,
+    "diagnosis_count": 5,
+    "safe_drugs": 15,
+    "warned_drugs": 0,
+    "blocked_drugs": 0,
+    "urgency": "routine"
+  },
+  {
+    "run_id": "ccc9ad9001f4",
+    "timestamp": "2026-05-15T17:21:29.265248+00:00",
+    "patient_id": 1,
+    "overall_score": 92.9,
+    "grade": "A",
+    "scores": {
+      "diagnosis_confidence": 76.3,
+      "symptom_coverage": 100.0,
+      "medication_safety": 100.0,
+      "icd_validity": 100.0,
+      "allergy_safety": 100.0
+    },
+    "top_diagnosis": "Acute viral pharyngitis",
+    "llm_used": true,
+    "diagnosis_count": 5,
+    "safe_drugs": 10,
+    "warned_drugs": 0,
+    "blocked_drugs": 0,
+    "urgency": "routine"
+  },
+  {
+    "run_id": "183396fd5200",
+    "timestamp": "2026-05-16T06:53:55.541115+00:00",
+    "patient_id": 1,
+    "overall_score": 77.5,
+    "grade": "B",
+    "scores": {
+      "diagnosis_confidence": 58.3,
+      "symptom_coverage": 50.0,
+      "medication_safety": 100.0,
+      "icd_validity": 100.0,
+      "allergy_safety": 100.0
+    },
+    "top_diagnosis": "Hypertension",
+    "llm_used": false,
+    "diagnosis_count": 5,
+    "safe_drugs": 10,
+    "warned_drugs": 0,
+    "blocked_drugs": 0,
+    "urgency": "routine"
+  }
+]
