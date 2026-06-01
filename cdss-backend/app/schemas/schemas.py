@@ -13,9 +13,12 @@ class UserRegister(BaseModel):
     email: EmailStr
     full_name: str
     password: str
-    role: Literal["physician", "nurse", "pharmacist"] = "physician"
+    role: Literal["physician", "nurse", "pharmacist", "patient"] = "physician"
     license_number: Optional[str] = None
     profile_image: Optional[str] = Field(None, description="Optional data URL image (JPEG/PNG)")
+    # Extra fields required only when role=patient
+    date_of_birth: Optional[str] = None   # YYYY-MM-DD
+    gender: Optional[str] = None          # Male / Female / Other
 
     @field_validator("username", "full_name", mode="before")
     @classmethod
@@ -59,6 +62,7 @@ class UserOut(BaseModel):
     profile_image: Optional[str] = None
     is_active: bool
     last_login: Optional[datetime]
+    linked_patient_id: Optional[int] = None
 
     model_config = {"from_attributes": True}
 

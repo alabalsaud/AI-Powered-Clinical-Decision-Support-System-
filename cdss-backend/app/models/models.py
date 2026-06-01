@@ -22,6 +22,7 @@ class UserRole(str, enum.Enum):
     nurse          = "nurse"
     pharmacist     = "pharmacist"
     administrator  = "administrator"
+    patient        = "patient"
 
 
 class Gender(str, enum.Enum):
@@ -83,6 +84,11 @@ class User(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     version: Mapped[int]         = mapped_column(Integer, default=1)   # optimistic locking
+
+    # Optional link to a Patient record (for role=patient portal users)
+    linked_patient_id: Mapped[Optional[int]] = mapped_column(
+        Integer, ForeignKey("patients.id"), nullable=True, default=None
+    )
 
     # Relationships
     clinical_notes: Mapped[List["ClinicalNote"]]  = relationship("ClinicalNote",  back_populates="author")

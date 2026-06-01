@@ -39,3 +39,15 @@ def require_admin(current_user=Depends(get_current_user)):
             detail="Administrator access required",
         )
     return current_user
+
+
+def require_clinical_staff(current_user=Depends(get_current_user)):
+    """Block patient-role users from clinical-staff-only routes."""
+    role = getattr(current_user, "role", None)
+    role_val = role.value if hasattr(role, "value") else str(role)
+    if role_val == UserRole.patient.value:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Clinical staff access required",
+        )
+    return current_user
