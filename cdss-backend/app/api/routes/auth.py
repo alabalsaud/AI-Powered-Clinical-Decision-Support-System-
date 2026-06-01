@@ -8,7 +8,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
-from app.models.models import User, UserRole
+from app.models.models import User, UserRole, Patient
 from app.schemas.schemas import UserRegister, UserLogin, TokenResponse, UserOut
 from app.core.security import hash_password, verify_password, create_access_token, get_current_user
 from app.services.audit import log_action
@@ -38,9 +38,14 @@ def register(payload: UserRegister, request: Request, db: Session = Depends(get_
     except ValueError as e:
         raise HTTPException(400, f"Invalid role: {payload.role}") from e
 
+    # Patient role requires DOB and gender to create their Patient record
+    if role_enum == UserRole.patient:
+        if not payload.date_of_birth or not payload.gender:
+            raise HTTPException(400, "Date of birth and gender are required for patient registration")
+
     user = User(
         username=payload.username.strip(),
-        email=str(payload.email).strip().lower(),
+        email=email_norm,
         full_name=payload.full_name.strip(),
         hashed_password=hash_password(payload.password),
         role=role_enum,
@@ -48,6 +53,33 @@ def register(payload: UserRegister, request: Request, db: Session = Depends(get_
         profile_image=payload.profile_image,
     )
     db.add(user)
+    db.flush()  # get user.id before commit
+
+    # Auto-create linked Patient record for patient-role users
+    if role_enum == UserRole.patient:
+        from app.models.models import Gender as GenderEnum
+        count = db.query(Patient).count()
+        mrn = f"MRN-{10000 + count + 1}"
+        # Derive first/last name from full_name
+        parts = payload.full_name.strip().split(" ", 1)
+        first = parts[0]
+        last  = parts[1] if len(parts) > 1 else parts[0]
+        try:
+            gender_enum = GenderEnum(payload.gender)
+        except ValueError:
+            gender_enum = GenderEnum.other
+        patient = Patient(
+            mrn=mrn,
+            first_name=first,
+            last_name=last,
+            date_of_birth=payload.date_of_birth,
+            gender=gender_enum,
+            email=email_norm,
+        )
+        db.add(patient)
+        db.flush()
+        user.linked_patient_id = patient.id
+
     db.commit()
     db.refresh(user)
 
