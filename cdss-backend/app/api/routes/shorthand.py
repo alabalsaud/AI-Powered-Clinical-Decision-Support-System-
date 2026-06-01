@@ -32,7 +32,7 @@ from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.core.security import create_access_token, get_current_user, verify_password
+from app.core.security import create_access_token, get_current_user, verify_password, require_clinical_staff
 from app.db.database import get_db
 from app.models.models import (
     AuditLog, Diagnosis, Patient, Prescription, User,
@@ -823,3 +823,164 @@ def shorthand_audit_logs(
             for lg in logs
         ],
     }
+
+
+# ═══════════════════════════════════════════════════════════════════
+# PATIENT PORTAL ENDPOINTS  (/api/portal/*)
+# Only accessible by role=patient; each user sees their own data only
+# ═══════════════════════════════════════════════════════════════════
+
+def _get_portal_patient(current_user: User, db: Session) -> Patient:
+    """Return the Patient record linked to this portal user, or 404."""
+    role = getattr(current_user, "role", None)
+    role_str = (role.value if hasattr(role, "value") else str(role or "")).lower()
+    if role_str != "patient":
+        raise HTTPException(403, "Patient portal access only")
+    if not current_user.linked_patient_id:
+        raise HTTPException(404, "No patient record linked to this account. Contact your administrator.")
+    patient = db.query(Patient).filter(
+        Patient.id == current_user.linked_patient_id,
+        Patient.is_active == True,
+    ).first()
+    if not patient:
+        raise HTTPException(404, "Linked patient record not found")
+    return patient
+
+
+@router.get("/portal/me", response_model=PatientOut)
+def portal_my_record(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Return the portal user's own patient record."""
+    patient = _get_portal_patient(current_user, db)
+    return patient
+
+
+@router.get("/portal/prescriptions")
+def portal_my_prescriptions(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Return prescriptions for the portal user's patient record."""
+    from app.models.models import Prescription
+    patient = _get_portal_patient(current_user, db)
+    rxs = db.query(Prescription).filter(
+        Prescription.patient_id == patient.id
+    ).order_by(Prescription.created_at.desc()).all()
+    return [
+        {
+            "id":           rx.id,
+            "drug_name":    rx.drug_name,
+            "dose":         rx.dose,
+            "frequency":    rx.frequency,
+            "duration":     rx.duration,
+            "status":       rx.status.value if hasattr(rx.status, "value") else str(rx.status),
+            "notes":        rx.special_instructions,
+            "created_at":   rx.created_at.isoformat() if rx.created_at else None,
+        }
+        for rx in rxs
+    ]
+
+
+@router.get("/portal/diagnoses")
+def portal_my_diagnoses(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Return diagnoses for the portal user's patient record."""
+    from app.models.models import Diagnosis
+    patient = _get_portal_patient(current_user, db)
+    dxs = db.query(Diagnosis).filter(
+        Diagnosis.patient_id == patient.id
+    ).order_by(Diagnosis.diagnosed_at.desc()).all()
+    return [
+        {
+            "id":               dx.id,
+            "diagnosis_name":   dx.diagnosis_name,
+            "diagnosis_code":   dx.diagnosis_code,
+            "confidence_score": dx.confidence_score,
+            "status":           dx.status.value if hasattr(dx.status, "value") else str(dx.status),
+            "source":           dx.source,
+            "is_confirmed":     dx.is_confirmed,
+            "diagnosed_at":     dx.diagnosed_at.isoformat() if dx.diagnosed_at else None,
+        }
+        for dx in dxs
+    ]
+
+
+@router.get("/portal/reports")
+def portal_my_reports(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Return summary report data for the portal user's patient record."""
+    from app.models.models import Diagnosis, Prescription
+    patient = _get_portal_patient(current_user, db)
+    dxs = db.query(Diagnosis).filter(Diagnosis.patient_id == patient.id).order_by(Diagnosis.diagnosed_at.desc()).limit(10).all()
+    rxs = db.query(Prescription).filter(Prescription.patient_id == patient.id).order_by(Prescription.created_at.desc()).limit(10).all()
+    return {
+        "patient": {
+            "id":            patient.id,
+            "mrn":           patient.mrn,
+            "full_name":     patient.full_name,
+            "date_of_birth": patient.date_of_birth,
+            "gender":        patient.gender.value if hasattr(patient.gender, "value") else str(patient.gender),
+            "blood_type":    patient.blood_type,
+        },
+        "conditions":    [mh.condition for mh in patient.medical_histories],
+        "allergies":     [a.allergen for a in patient.allergies],
+        "diagnoses_count":     len(dxs),
+        "prescriptions_count": len(rxs),
+        "recent_diagnoses":  [{"name": d.diagnosis_name, "status": d.status.value if hasattr(d.status,"value") else str(d.status), "date": d.diagnosed_at.isoformat() if d.diagnosed_at else None} for d in dxs],
+        "recent_prescriptions": [{"drug": r.drug_name, "status": r.status.value if hasattr(r.status,"value") else str(r.status), "date": r.created_at.isoformat() if r.created_at else None} for r in rxs],
+    }
+
+
+# ── POST /api/portal/create-account  (admin only) ────────────────────────────
+
+class PatientPortalCreate(BaseModel):
+    email: EmailStr
+    password: str
+    full_name: str
+    username: str
+    patient_id: int
+
+
+@router.post("/portal/create-account", status_code=201)
+def portal_create_account(
+    payload: PatientPortalCreate,
+    db:      Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Admin creates a portal (patient-role) user and links it to a Patient record. Admin only."""
+    from app.models.models import UserRole as UR
+    role = getattr(current_user, "role", None)
+    role_val = role.value if hasattr(role, "value") else str(role or "")
+    if role_val != "administrator":
+        raise HTTPException(status_code=403, detail="Administrator access required")
+
+    from app.core.security import hash_password as _hash
+
+    if db.query(User).filter(func.lower(User.email) == payload.email.lower()).first():
+        raise HTTPException(400, "Email already registered")
+    if db.query(User).filter(func.lower(User.username) == payload.username.lower()).first():
+        raise HTTPException(400, "Username already taken")
+    patient = db.query(Patient).filter(Patient.id == payload.patient_id).first()
+    if not patient:
+        raise HTTPException(404, f"Patient #{payload.patient_id} not found")
+
+    from app.models.models import UserRole as _UR
+    user = User(
+        username=payload.username,
+        email=payload.email,
+        hashed_password=_hash(payload.password),
+        full_name=payload.full_name,
+        role=_UR.patient,
+        linked_patient_id=payload.patient_id,
+        is_active=True,
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return {"message": "Patient portal account created", "user_id": user.id, "patient_id": payload.patient_id}
